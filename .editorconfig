@@ -1,0 +1,13 @@
+﻿[*.cs]
+
+# CS8618: Un campo que no acepta valores NULL debe contener un valor distinto de NULL al salir del constructor. Considere la posibilidad de declararlo como que admite un valor NULL.
+dotnet_diagnostic.CS8618.severity = suggestion
+
+# CS8629: Un tipo que acepta valores NULL puede ser nulo.
+dotnet_diagnostic.CS8629.severity = suggestion
+
+# CS8603: Posible tipo de valor devuelto de referencia nulo
+dotnet_diagnostic.CS8603.severity = suggestion
+
+# CS1591: Falta el comentario XML para el tipo o miembro visible públicamente
+dotnet_diagnostic.CS1591.severity = suggestion

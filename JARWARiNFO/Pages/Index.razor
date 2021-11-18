@@ -1,0 +1,160 @@
+﻿@page "/"
+
+<PageTitle>Información</PageTitle>
+
+@using JARWARiNFO.Models
+@using JARWARiNFO.Services
+@using System.Collections.ObjectModel
+@implements IDisposable
+@inject HWMonitor hw
+
+<body>
+    <header>
+        <section class="header">
+            <h1>Información</h1>
+        </section>
+    </header>
+
+    <main>
+        @if (hw.Hardware is null)
+        {
+            <p>Cargando...</p>
+        }
+        else
+        {
+            @foreach (var hardware in hw.Hardware)
+            {
+                hardware.Update();
+                
+                <article>
+                    <section class="title-panel">
+                        @switch (GetIdentifier(hardware.Identifier.ToString()))
+                        {
+                            case "motherboard":
+                                <img class="icon" src="/img/motherboard.png"/>
+                                break;
+                            case "amdcpu":
+                                <img class="icon" src="/img/cpu.png"/>
+                                break;
+                            case "intelcpu":
+                                <img class="icon" src="/img/cpu.png"/>
+                                break;
+                            case "ram":
+                                <img class="icon" src="/img/ram.png"/>
+                                break;
+                            case "gpu-amd":
+                                <img class="icon" src="/img/gpu.png"/>
+                                break;
+                            case "gpu-nvidia":
+                                <img class="icon" src="/img/gpu.png"/>
+                                break;
+                            case "hdd":
+                                <img class="icon" src="/img/hard-disc.png"/>
+                                break;
+                            case "nvme":
+                                <img class="icon" src="/img/ssd-nvme.png"/>
+                                break;
+                            default:
+                                break;
+                        }
+                        <h4>@hardware.Name</h4>
+                    </section>
+
+                    <section class="container-table-panel">
+
+                    @{ var groupby = hardware.Sensors.GroupBy(grb => grb.SensorType); }
+
+                    @foreach (var group in groupby)
+                    {
+                        <section class="container-table-panel-item">
+                            <table class="tableX">
+                                <caption>@group.Key.ToString()</caption>
+                                <tbody>
+
+                                @foreach (var sensor in group)
+                                {
+                                    <tr class="trX">
+                                        <td class="tdX">@sensor.Name</td>
+                                        <td class="tdX">@(float.IsNaN((float)sensor.Value) ? "N/A" : Math.Round((decimal)sensor.Value, 2))</td>
+                                        @switch (sensor.SensorType.ToString())
+                                        {
+                                            case "Voltage":
+                                                <td class="tdX-typechar">V</td>
+                                                break;
+
+                                            case "Power":
+                                                <td class="tdX-typechar">W</td>
+                                                break;
+
+                                            case "Clock":
+                                                <td class="tdX-typechar">MHz</td>
+                                                break;
+
+                                            case "Temperature":
+                                                <td class="tdX-typechar">°C</td>
+                                                break;
+
+                                            case "Load" or "Level" or "Control":
+                                                <td class="tdX-typechar">%</td>
+                                                break;
+
+                                            case "Data":
+                                                <td class="tdX-typechar">GB</td>
+                                                break;
+
+                                            case "SmallData":
+                                                <td class="tdX-typechar">MB</td>
+                                                break;
+
+                                            case "Fan":
+                                                <td class="tdX-typechar">RPM</td>
+                                                break;
+
+                                            case "Throughput":
+                                                <td class="tdX-typechar">KB/s</td>
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+                                    </tr>
+                                }
+
+                                </tbody>
+                            </table>
+                        </section>
+                    }
+
+                    </section>
+                </article>
+            }
+        }
+    </main>
+</body>
+
+@code {
+    public System.Timers.Timer timer;
+
+    protected override void OnInitialized()
+    {
+        if (timer is null)
+        {
+            timer = new() { Enabled = true, Interval = 2000 };
+            timer.Elapsed += OnRefreshData;
+        }
+
+        base.OnInitialized();
+    }
+
+    private void OnRefreshData(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    public string GetIdentifier(string fullidentifier)
+    {
+        return fullidentifier.Split('/')[1];
+    }
+
+    public void Dispose() => timer.Dispose();
+}
