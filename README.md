@@ -1,3 +1,5 @@
+![JARWARINFO](https://user-images.githubusercontent.com/93444165/142651677-50ed5e4a-5340-451d-9bf0-d3cb4dde4cd8.png)
+
 # JARWARiNFO
 JARWARiNFO es un proyecto realizado con Blazor Server, que también integra una Web API, donde va a poder monitorear información relacionada con el hardware de su PC.
 
